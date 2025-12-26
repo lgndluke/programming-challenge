@@ -1,0 +1,7 @@
+# Folders
+.idea
+target
+
+# Files
+commit-msg
+commit_msg_install_win.ps1
