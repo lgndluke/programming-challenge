@@ -1,31 +1,21 @@
 package de.exxcellent.challenge;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Example JUnit 5 test case.
- * @author Benjamin Schmid <benjamin.schmid@exxcellent.de>
+ * {@link App} test class.
+ *
+ * @author Benjamin Schmid <benjamin.schmid@exxcellent.de>, Lukas Jeckle
  */
-class AppTest {
-
-    private String successLabel = "not successful";
-
-    @BeforeEach
-    void setUp() {
-        successLabel = "successful";
-    }
+class AppTest
+{
 
     @Test
-    void aPointlessTest() {
-        assertEquals("successful", successLabel, "My expectations were not met");
-    }
-
-    @Test
-    void runFootball() {
-        App.main("--football", "football.csv");
+    void runApp()
+    {
+        assertDoesNotThrow(() -> App.main());
     }
 
 }
