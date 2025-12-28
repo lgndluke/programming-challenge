@@ -1,0 +1,85 @@
+@startuml
+
+' =======================================================================
+' Framework - Event driven architecture pattern:
+'
+' Reference Link:
+' https://github.com/iluwatar/java-design-patterns/blob/master/event-driven-architecture/README.md
+' =======================================================================
+
+abstract class Event
+{
+    - {field} final String eventId = UUID.randomUUID().toString();
+    - {field} final Instant eventTimeStamp = Instant.now();
+    + {method} Class<? extends Event> getType();
+    + {method} String getEventId();
+    + {method} Instant getEventTime();
+}
+
+interface EventHandler<T extends Event>
+{
+    + {method} CompletableFuture<?> onEvent(T event);
+}
+
+class EventDispatcher
+{
+    - {field} final Map<Class<? extends Event>, EventHandler<? extends Event>> handlers;
+    + {method} <T extends Event> void registerHandler(Class<T> eventType, EventHandler<T> handler);
+    + {method} <T extends Event> CompletableFuture<?> dispatchEvent(T event);
+}
+
+' =======================================================================
+' Event / Concern 1 - Importing the .csv file contents:
+' =======================================================================
+
+class CsvFileImportEvent extends Event
+{
+    - {field} final String filePath;
+    + {method} String getFilePath();
+}
+
+class CsvFileImportEventHandler implements EventHandler<CsvFileImportEvent>
+{
+    - {field} {static} final String COMMA_DELIMITER = ",";
+    - {field} {static} final String FILE_EXTENSION  = ".csv";
+    + {method} CompletableFuture<DataFrame> onEvent(CsvFileImportEvent event);
+    - {method} void validateFilePath(String filePath) throws IllegalArgumentException;
+    - {method} DataFrame readCsvFileToDataFrame(String filePath) throws IOException;
+}
+
+' =======================================================================
+' Data / Concern 2 - Storing the read file contents in a data structure:
+' =======================================================================
+
+class DataFrame
+{
+    - {field} final {static} String emptyDataFrameString = "DataFrame: []";
+    - {field} final Map<String, List<String> columns = new ConcurrentHashMap<>();
+    + {method} void putColumnValues(String columnName, List<String> values);
+    + {method} String toString();
+    + {method} List<String> getColumnNames();
+    + {method} List<String> getColumnValues(String columnName);
+}
+
+' =======================================================================
+' Event / Concern 3 - Processing converted contents:
+' =======================================================================
+
+class MinDistanceProcessingEvent extends Event
+{
+    - {field} final List<String> minValues;
+    - {field} final List<String> maxValues;
+    - {field} final List<String> returnValues;
+    + {method} List<String> getMinValues();
+    + {method} List<String> getMaxValues();
+    + {method} List<String> getReturnValues();
+}
+
+class MinDistanceProcessingEventHandler implements EventHandler<MinDistanceProcessingEvent>
+{
+    + {method} CompletableFuture<String> onEvent(MinDistanceProcessingEvent event);
+    - {method} String process(List<String> minValues, List<String> maxValues, List<String> returnValues) throws IllegalArgumentException;
+    - {method} int getLowestDistanceIndex(List<Integer> minValuesInt, List<Integer> maxValuesInt, List<String> returnValues);
+}
+
+@enduml
