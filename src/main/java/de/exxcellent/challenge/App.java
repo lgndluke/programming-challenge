@@ -1,25 +1,62 @@
 package de.exxcellent.challenge;
 
+import de.exxcellent.challenge.data.DataFrame;
+import de.exxcellent.challenge.event_handlers.CsvFileImportEventHandler;
+import de.exxcellent.challenge.event_handlers.MinDistanceProcessingEventHandler;
+import de.exxcellent.challenge.events.CsvFileImportEvent;
+import de.exxcellent.challenge.events.MinDistanceProcessingEvent;
+import de.exxcellent.challenge.framework.EventDispatcher;
+
 /**
  * The entry class for your solution. This class is only aimed as starting point and not intended as baseline for your software
  * design. Read: create your own classes and packages as appropriate.
  *
  * @author Benjamin Schmid <benjamin.schmid@exxcellent.de>
  */
-public final class App {
+public class App {
+
+    private final static String weatherFilePath  = "src/main/resources/de/exxcellent/challenge/weather.csv";
+    private final static String footballFilePath = "src/main/resources/de/exxcellent/challenge/football.csv";
 
     /**
      * This is the main entry method of your program.
      * @param args The CLI arguments passed
      */
-    public static void main(String... args) {
+    public static void main(String... args)
+    {
+        EventDispatcher dispatcher = new EventDispatcher();
 
-        // Your preparation code …
+        dispatcher.registerHandler(
+                CsvFileImportEvent.class,
+                new CsvFileImportEventHandler()
+        );
+        dispatcher.registerHandler(
+                MinDistanceProcessingEvent.class,
+                new MinDistanceProcessingEventHandler()
+        );
 
-        String dayWithSmallestTempSpread = "Someday";     // Your day analysis function call …
+        CsvFileImportEvent weatherImportEvent  = new CsvFileImportEvent(weatherFilePath);
+        CsvFileImportEvent footballImportEvent = new CsvFileImportEvent(footballFilePath);
+
+        DataFrame weatherDataFrame  = (DataFrame) dispatcher.dispatchEvent(weatherImportEvent).join();
+        DataFrame footballDataFrame = (DataFrame) dispatcher.dispatchEvent(footballImportEvent).join();
+
+        MinDistanceProcessingEvent smallestTempSpread = new MinDistanceProcessingEvent(
+                weatherDataFrame.getColumnValues("MnT"),
+                weatherDataFrame.getColumnValues("MxT"),
+                weatherDataFrame.getColumnValues("Day")
+        );
+        MinDistanceProcessingEvent smallestGoalSpread = new MinDistanceProcessingEvent(
+                footballDataFrame.getColumnValues("Goals"),
+                footballDataFrame.getColumnValues("Goals Allowed"),
+                footballDataFrame.getColumnValues("Team")
+        );
+
+        String dayWithSmallestTempSpread  = (String) dispatcher.dispatchEvent(smallestTempSpread).join();
+        String teamWithSmallestGoalSpread = (String) dispatcher.dispatchEvent(smallestGoalSpread).join();
+
         System.out.printf("Day with smallest temperature spread : %s%n", dayWithSmallestTempSpread);
-
-        String teamWithSmallestGoalSpread = "A good team"; // Your goal analysis function call …
         System.out.printf("Team with smallest goal spread       : %s%n", teamWithSmallestGoalSpread);
     }
+
 }
