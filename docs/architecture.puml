@@ -23,7 +23,7 @@ interface EventHandler<T extends Event>
 
 class EventDispatcher
 {
-    - {field} final Map<Class<? extends Event>, EventHandler<? extends Event>> handlers;
+    - {field} final Map<Class<? extends Event>, EventHandler<? extends Event>> handlers = new ConcurrentHashMap<>();
     + {method} <T extends Event> void registerHandler(Class<T> eventType, EventHandler<T> handler);
     + {method} <T extends Event> CompletableFuture<?> dispatchEvent(T event);
 }
