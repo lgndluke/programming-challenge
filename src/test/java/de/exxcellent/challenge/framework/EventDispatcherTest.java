@@ -20,16 +20,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EventDispatcherTest
 {
 
-    private static EventDispatcher eventDispatcher;
-
     private static final String weatherFilePath  = "src/test/resources/de/exxcellent/challenge/weather.csv";
 
     @BeforeEach
     void setUp()
     {
-        eventDispatcher = new EventDispatcher();
-
-        eventDispatcher.registerHandler(
+        EventDispatcher.getInstance().registerHandler(
                 CsvFileImportEvent.class,
                 new CsvFileImportEventHandler()
         );
@@ -38,13 +34,13 @@ public class EventDispatcherTest
     @Test
     void instantiated()
     {
-        assertNotNull(eventDispatcher);
+        assertNotNull(EventDispatcher.getInstance());
     }
 
     @Test
     void registerHandlerDoubledCsvFileImportEvent()
     {
-        assertDoesNotThrow(() -> eventDispatcher.registerHandler(
+        assertDoesNotThrow(() -> EventDispatcher.getInstance().registerHandler(
                 CsvFileImportEvent.class,
                 new CsvFileImportEventHandler())
         );
@@ -53,7 +49,7 @@ public class EventDispatcherTest
     @Test
     void registerHandlerMinDistanceProcessingEvent()
     {
-        assertDoesNotThrow(() -> eventDispatcher.registerHandler(
+        assertDoesNotThrow(() -> EventDispatcher.getInstance().registerHandler(
                 MinDistanceProcessingEvent.class,
                 new MinDistanceProcessingEventHandler()
         ));
@@ -63,7 +59,7 @@ public class EventDispatcherTest
     void dispatchEventWeatherCsvFileImportEvent()
     {
         CsvFileImportEvent weatherFileImportEvent = new CsvFileImportEvent(weatherFilePath);
-        DataFrame weatherDataFrame = (DataFrame) eventDispatcher.dispatchEvent(weatherFileImportEvent).join();
+        DataFrame weatherDataFrame = (DataFrame) EventDispatcher.getInstance().dispatchEvent(weatherFileImportEvent).join();
 
         assertNotNull(weatherDataFrame);
     }
@@ -77,7 +73,7 @@ public class EventDispatcherTest
                 List.of("a, b, c")
         );
 
-        String minDistance = (String) eventDispatcher.dispatchEvent(smallestTempSpread).join();
+        String minDistance = (String) EventDispatcher.getInstance().dispatchEvent(smallestTempSpread).join();
 
         assertNull(minDistance);
     }
