@@ -24,13 +24,11 @@ public class App {
      */
     public static void main(String... args)
     {
-        EventDispatcher dispatcher = new EventDispatcher();
-
-        dispatcher.registerHandler(
+        EventDispatcher.getInstance().registerHandler(
                 CsvFileImportEvent.class,
                 new CsvFileImportEventHandler()
         );
-        dispatcher.registerHandler(
+        EventDispatcher.getInstance().registerHandler(
                 MinDistanceProcessingEvent.class,
                 new MinDistanceProcessingEventHandler()
         );
@@ -38,8 +36,8 @@ public class App {
         CsvFileImportEvent weatherImportEvent  = new CsvFileImportEvent(weatherFilePath);
         CsvFileImportEvent footballImportEvent = new CsvFileImportEvent(footballFilePath);
 
-        DataFrame weatherDataFrame  = (DataFrame) dispatcher.dispatchEvent(weatherImportEvent).join();
-        DataFrame footballDataFrame = (DataFrame) dispatcher.dispatchEvent(footballImportEvent).join();
+        DataFrame weatherDataFrame  = (DataFrame) EventDispatcher.getInstance().dispatchEvent(weatherImportEvent).join();
+        DataFrame footballDataFrame = (DataFrame) EventDispatcher.getInstance().dispatchEvent(footballImportEvent).join();
 
         MinDistanceProcessingEvent smallestTempSpread = new MinDistanceProcessingEvent(
                 weatherDataFrame.getColumnValues("MnT"),
@@ -52,8 +50,8 @@ public class App {
                 footballDataFrame.getColumnValues("Team")
         );
 
-        String dayWithSmallestTempSpread  = (String) dispatcher.dispatchEvent(smallestTempSpread).join();
-        String teamWithSmallestGoalSpread = (String) dispatcher.dispatchEvent(smallestGoalSpread).join();
+        String dayWithSmallestTempSpread  = (String) EventDispatcher.getInstance().dispatchEvent(smallestTempSpread).join();
+        String teamWithSmallestGoalSpread = (String) EventDispatcher.getInstance().dispatchEvent(smallestGoalSpread).join();
 
         System.out.printf("Day with smallest temperature spread : %s%n", dayWithSmallestTempSpread);
         System.out.printf("Team with smallest goal spread       : %s%n", teamWithSmallestGoalSpread);
