@@ -23,7 +23,9 @@ interface EventHandler<T extends Event>
 
 class EventDispatcher
 {
+    - {field} {static} volatile EventDispatcher instance;
     - {field} final Map<Class<? extends Event>, EventHandler<? extends Event>> handlers = new ConcurrentHashMap<>();
+    - {method} {static} EventDispatcher getInstance();
     + {method} <T extends Event> void registerHandler(Class<T> eventType, EventHandler<T> handler);
     + {method} <T extends Event> CompletableFuture<?> dispatchEvent(T event);
 }
